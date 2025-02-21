@@ -7,6 +7,7 @@ import com.teamproject.clonemoviepop.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,16 +26,36 @@ public class Comment extends Auditable {
     @Column(nullable = false)
     private Integer likes = 0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "REVIEW_BOARD_ID")
     private ReviewBoard reviewBoard;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
+    @Setter
     private User user;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CommentLike> commentLikes = new HashSet<>();
+
+    //댓글 작성 연관관계 편의메서드
+    public void setReviewBoard(ReviewBoard reviewBoard) {
+        this.reviewBoard = reviewBoard;
+        if (reviewBoard.getComments().contains(this)) {
+            reviewBoard.getComments().add(this);
+        }
+    }
+
+    //댓글 삭제 연관관계 편의메서드(연관관계 끊고 orphanremoval로 삭제)
+    public void removeComment(User user, ReviewBoard reviewBoard) {
+        user.getComments().remove(this);
+        reviewBoard.getComments().remove(this);
+    }
+
+    //댓글 내용 수정 메서드
+    public void updateComment(String newContent) {
+        this.content = newContent;
+    }
 
     @Override
     public boolean equals(Object object) {
