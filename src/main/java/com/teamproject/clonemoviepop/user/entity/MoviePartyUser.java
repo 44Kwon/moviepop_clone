@@ -26,6 +26,7 @@ public class MoviePartyUser {
     @JoinColumn(name = "movie_party_id")
     private MovieParty movieParty;
 
+    //객체 자체 비교는 무겁고 비효율적. 필드 전부 비교하기 때문. => 아이디 값만 비교하자~
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
